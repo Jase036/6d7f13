@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState, useContext } from 'react';
+import React, { useCallback, useEffect, useState, useContext, useRef } from 'react';
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
 import { Grid, CssBaseline, Button } from '@material-ui/core';
@@ -16,6 +16,7 @@ const useStyles = makeStyles((theme) => ({
 
 const Home = ({ user, logout }) => {
   const history = useHistory();
+  
 
   const socket = useContext(SocketContext);
 
@@ -107,7 +108,7 @@ const Home = ({ user, logout }) => {
       }
 
       conversations.forEach((convo) => {
-        if (convo.id === message.conversationId) {
+        if (convo.id === message?.conversationId) {
           convo.messages.push(message);
           convo.latestMessageText = message.text;
         }
@@ -180,18 +181,25 @@ const Home = ({ user, logout }) => {
   }, [user, history, isLoggedIn]);
 
   useEffect(() => {
+    let subscribed = true
     const fetchConversations = async () => {
       try {
         const { data } = await axios.get('/api/conversations');
+        if (!subscribed) return null
         setConversations(data);
       } catch (error) {
+        if (!subscribed) return null
         console.error(error);
       }
     };
     if (!user.isFetching) {
       fetchConversations();
     }
-  }, [user]);
+
+    return () => {
+      subscribed = false
+    }
+  }, [user, conversations]);
 
   const handleLogout = async () => {
     if (user && user.id) {
