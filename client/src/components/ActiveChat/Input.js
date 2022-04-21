@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { FormControl, FilledInput } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -15,9 +15,22 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const Input = ({ otherUser, conversationId, user, postMessage }) => {
+const Input = ({ otherUser, conversationId, user, postMessage, messages }) => {
   const classes = useStyles();
   const [text, setText] = useState('');
+
+  //create a ref so that scroll function has target to scroll to
+  const chatEndRef = useRef(null)
+
+  //smoothly scrolls to bring ref element into view
+  const scrollToBottom = () => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }
+
+  //scroll when new messages arrive/are sent
+  useEffect(() => {
+    scrollToBottom()
+  }, [messages]);
 
   const handleChange = (event) => {
     setText(event.target.value);
@@ -36,6 +49,7 @@ const Input = ({ otherUser, conversationId, user, postMessage }) => {
     };
     await postMessage(reqBody);
     setText('');
+    scrollToBottom();
   };
 
   return (
@@ -48,6 +62,7 @@ const Input = ({ otherUser, conversationId, user, postMessage }) => {
           value={text}
           name="text"
           onChange={handleChange}
+          ref={chatEndRef}
         />
       </FormControl>
     </form>

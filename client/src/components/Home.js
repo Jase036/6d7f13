@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState, useContext, useRef } from 'react';
+import React, { useCallback, useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
 import { Grid, CssBaseline, Button } from '@material-ui/core';
@@ -22,6 +22,7 @@ const Home = ({ user, logout }) => {
 
   const [conversations, setConversations] = useState([]);
   const [activeConversation, setActiveConversation] = useState(null);
+  const [newMessageToggle, setNewMessageToggle ] = useState(true)  //State toggles on new message post
 
   const classes = useStyles();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -74,6 +75,7 @@ const Home = ({ user, logout }) => {
       }
 
       sendMessage(data, body);
+      setNewMessageToggle(prev => !prev) //Toggles state on new message post
     } catch (error) {
       console.error(error);
     }
@@ -199,7 +201,7 @@ const Home = ({ user, logout }) => {
     return () => {
       subscribed = false
     }
-  }, [user, conversations]);
+  }, [user, newMessageToggle]);
 
   const handleLogout = async () => {
     if (user && user.id) {
