@@ -77,7 +77,7 @@ const Home = ({ user, logout }) => {
       }
 
       sendMessage(data, body);
-      setNewMessageToggle(prev => !prev) //Toggles state on new message post
+      
     } catch (error) {
       console.error(error);
     }
@@ -97,7 +97,7 @@ const Home = ({ user, logout }) => {
     [setConversations, conversations]
   );
 
-  const addMessageToConversation = 
+  const addMessageToConversation = useCallback (
     (data) => {
       // if sender isn't null, that means the message needs to be put in a brand new convo
       const { message, sender = null } = data;
@@ -118,9 +118,11 @@ const Home = ({ user, logout }) => {
         }
       });
       setConversations(conversations);
-    }
-  //   [setConversations, conversations]
-  // );
+      setNewMessageToggle(prev => !prev) //Toggles state on new message post
+      return conversations
+    },
+    [setConversations, conversations]
+  );
 
   const setActiveChat = (username) => {
     setActiveConversation(username);
@@ -169,7 +171,7 @@ const Home = ({ user, logout }) => {
       socket.off('remove-offline-user', removeOfflineUser);
       socket.off('new-message', addMessageToConversation);
     };
-  }, [addOnlineUser, removeOfflineUser, socket]);
+  }, [addMessageToConversation, addOnlineUser, removeOfflineUser, socket]);
 
   useEffect(() => {
     // when fetching, prevent redirect
