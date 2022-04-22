@@ -77,7 +77,7 @@ const Home = ({ user, logout }) => {
       }
 
       sendMessage(data, body);
-      
+      setNewMessageToggle(prev => !prev) //Toggles state on new message post
     } catch (error) {
       console.error(error);
     }
@@ -109,6 +109,7 @@ const Home = ({ user, logout }) => {
         };
         newConvo.latestMessageText = message.text;
         setConversations((prev) => [newConvo, ...prev]);
+        
       }
 
       conversations.forEach((convo) => {
