@@ -53,6 +53,7 @@ const Home = ({ user, logout }) => {
 
   const saveMessage = async (body) => {
     const { data } = await axios.post('/api/messages', body);
+    
     return data;
   };
 
@@ -65,6 +66,7 @@ const Home = ({ user, logout }) => {
   };
 
   const postMessage = async (body) => {
+    
     try {
       const data = await saveMessage(body);
 
@@ -95,7 +97,7 @@ const Home = ({ user, logout }) => {
     [setConversations, conversations]
   );
 
-  const addMessageToConversation = useCallback(
+  const addMessageToConversation = 
     (data) => {
       // if sender isn't null, that means the message needs to be put in a brand new convo
       const { message, sender = null } = data;
@@ -116,9 +118,9 @@ const Home = ({ user, logout }) => {
         }
       });
       setConversations(conversations);
-    },
-    [setConversations, conversations]
-  );
+    }
+  //   [setConversations, conversations]
+  // );
 
   const setActiveChat = (username) => {
     setActiveConversation(username);
@@ -167,7 +169,7 @@ const Home = ({ user, logout }) => {
       socket.off('remove-offline-user', removeOfflineUser);
       socket.off('new-message', addMessageToConversation);
     };
-  }, [addMessageToConversation, addOnlineUser, removeOfflineUser, socket]);
+  }, [addOnlineUser, removeOfflineUser, socket]);
 
   useEffect(() => {
     // when fetching, prevent redirect
