@@ -11,6 +11,7 @@ router.get("/", async (req, res, next) => {
       return res.sendStatus(401);
     }
     const userId = req.user.id;
+    
     const conversations = await Conversation.findAll({
       where: {
         [Op.or]: {
@@ -19,9 +20,11 @@ router.get("/", async (req, res, next) => {
         },
       },
       attributes: ["id"],
-      order: [[Message, "createdAt", "ASC"]],
+      order: [
+        [Message, "createdAt", "ASC"]
+      ],
       include: [
-        { model: Message, order: ["createdAt", "ASC"] },
+        { model: Message},
         {
           model: User,
           as: "user1",
@@ -71,6 +74,8 @@ router.get("/", async (req, res, next) => {
       convoJSON.latestMessageText = convoJSON.messages[convoJSON.messages.length - 1].text;
       conversations[i] = convoJSON;
     }
+    
+    conversations.sort((a, b) => a.messages[a.messages.length - 1].updatedAt > b.messages[b.messages.length - 1].updatedAt ? -1 : 1)
 
     res.json(conversations);
   } catch (error) {
