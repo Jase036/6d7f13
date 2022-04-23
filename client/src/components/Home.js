@@ -22,7 +22,6 @@ const Home = ({ user, logout }) => {
 
   const [conversations, setConversations] = useState([]);
   const [activeConversation, setActiveConversation] = useState(null);
-  const [newMessageToggle, setNewMessageToggle ] = useState(true)  //State toggles on new message post
 
   const classes = useStyles();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -77,7 +76,7 @@ const Home = ({ user, logout }) => {
       }
 
       sendMessage(data, body);
-      setNewMessageToggle(prev => !prev) //Toggles state on new message post
+
     } catch (error) {
       console.error(error);
     }
@@ -85,16 +84,20 @@ const Home = ({ user, logout }) => {
 
   const addNewConvo = useCallback(
     (recipientId, message) => {
-      conversations.forEach((convo) => {
-        if (convo.otherUser.id === recipientId) {
-          convo.messages.push(message);
-          convo.latestMessageText = message.text;
-          convo.id = message.conversationId;
-        }
-      });
-      setConversations(conversations);
+      
+      setConversations((prev) => {
+        const convoArrCopy = [...prev]
+        convoArrCopy.forEach((convo) => {
+          if (convo.otherUser.id === recipientId) {
+            convo.messages.push(message);
+            convo.latestMessageText = message.text;
+            convo.id = message.conversationId;
+          }
+        });
+        return convoArrCopy;
+      })
     },
-    [setConversations, conversations]
+    [setConversations]
   );
 
   const addMessageToConversation = useCallback (
@@ -112,17 +115,20 @@ const Home = ({ user, logout }) => {
         
       }
 
-      conversations.forEach((convo) => {
-        if (convo.id === message?.conversationId) {
-          convo.messages.push(message);
-          convo.latestMessageText = message.text;
-        }
-      });
-      setConversations(conversations);
-      setNewMessageToggle(prev => !prev) //Toggles state on new message post
-      return conversations
+      setConversations((prev) => {
+        const convoArrCopy = [...prev]
+        convoArrCopy.forEach((convo) => {
+          if (convo.id === message.conversationId) {
+            convo.messages.push(message);
+            convo.latestMessageText = message.text;
+          }
+        })
+        return convoArrCopy
+      }
+      )
+  
     },
-    [setConversations, conversations]
+    [setConversations]
   );
 
   const setActiveChat = (username) => {
@@ -188,14 +194,12 @@ const Home = ({ user, logout }) => {
   }, [user, history, isLoggedIn]);
 
   useEffect(() => {
-    let subscribed = true
+    
     const fetchConversations = async () => {
       try {
         const { data } = await axios.get('/api/conversations');
-        if (!subscribed) return null
         setConversations(data);
       } catch (error) {
-        if (!subscribed) return null
         console.error(error);
       }
     };
@@ -203,10 +207,7 @@ const Home = ({ user, logout }) => {
       fetchConversations();
     }
 
-    return () => {
-      subscribed = false
-    }
-  }, [user, newMessageToggle]);
+  }, [user]);
 
   const handleLogout = async () => {
     if (user && user.id) {
