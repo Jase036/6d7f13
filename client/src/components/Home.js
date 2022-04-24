@@ -86,12 +86,15 @@ const Home = ({ user, logout }) => {
     (recipientId, message) => {
       
       setConversations((prev) => {
-        const convoArrCopy = [...prev]
-        convoArrCopy.forEach((convo) => {
+        const convoArrCopy = [...prev].map((convo) => {
+          const convoCopy = { ...convo }
           if (convo.otherUser.id === recipientId) {
-            convo.messages.push(message);
+            convoCopy.messages = [...convoCopy.messages, message];
             convo.latestMessageText = message.text;
             convo.id = message.conversationId;
+            return convoCopy
+          } else {
+            return convo
           }
         });
         return convoArrCopy;
@@ -116,11 +119,14 @@ const Home = ({ user, logout }) => {
       }
 
       setConversations((prev) => {
-        const convoArrCopy = [...prev]
-        convoArrCopy.forEach((convo) => {
+        const convoArrCopy = [...prev].map((convo) => {
+          const convoCopy = { ...convo };
           if (convo.id === message.conversationId) {
-            convo.messages.push(message);
-            convo.latestMessageText = message.text;
+            convoCopy.messages = [...convoCopy.messages, message];
+            convoCopy.latestMessageText = message.text;
+            return convoCopy
+          } else { 
+            return convo 
           }
         })
         return convoArrCopy
