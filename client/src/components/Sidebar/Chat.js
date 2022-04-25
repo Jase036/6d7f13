@@ -17,12 +17,17 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Chat = ({ conversation, setActiveChat, unreadMessages }) => {
+const Chat = ({ conversation, setActiveChat, unreadMessages, user, markMessagesRead }) => {
   const classes = useStyles();
   const { otherUser } = conversation;
 
   const handleClick = async (conversation) => {
+    if (conversation.messages.filter(message => !message.isRead && message.senderId !== user.id).length > 0) {
+    const type = "batch"
+    markMessagesRead(type, conversation, user.id)
+    }
     await setActiveChat(conversation.otherUser.username);
+    
   };
 
   return (

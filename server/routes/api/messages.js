@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const { Conversation, Message } = require("../../db/models");
+const { Op } = require("sequelize");
 const onlineUsers = require("../../onlineUsers");
 
 // expects {recipientId, text, conversationId } in body (conversationId will be null if no conversation exists yet)
@@ -10,7 +11,7 @@ router.post("/", async (req, res, next) => {
     }
     const senderId = req.user.id;
     const { recipientId, text, conversationId, sender, isRead = false } = req.body;
-console.log(isRead)
+
     // if we already know conversation id, we can save time and just add it to message and return
     if (conversationId) {
       const message = await Message.create({ senderId, text, conversationId, isRead });
@@ -44,4 +45,54 @@ console.log(isRead)
   }
 });
 
+router.patch("/", async (req, res, next) => {
+  try {
+    if (!req.user) {
+      return res.sendStatus(401);
+    }
+    
+    const { conversationId, messageId, userId } = req.body;
+
+    const readUpdate = await Message.update(
+      {isRead: true},
+      {where : {
+        [Op.and]: {
+          conversationId : conversationId,
+          id: messageId,
+          } 
+        }
+      }
+    )
+
+    console.log(readUpdate)
+    res.json({ readUpdate });
+  } catch (error) {
+      next(error);
+    }
+  });
+
+  router.put("/", async (req, res, next) => {
+    try {
+      if (!req.user) {
+        return res.sendStatus(401);
+      }
+      
+      const { conversationId, userId } = req.body;
+  
+      const readUpdate = await Message.update(
+        {isRead: true},
+        {where :
+          { 
+            conversationId : conversationId,
+            senderId:  {[Op.ne]: userId}
+          }
+        }        
+      )
+  
+      console.log(readUpdate)
+      res.json({ readUpdate });
+    } catch (error) {
+        next(error);
+      }
+    });
 module.exports = router;

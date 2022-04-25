@@ -24,7 +24,8 @@ const ActiveChat = ({
   conversations,
   activeConversation,
   postMessage,
-  markMessagesRead
+  markMessagesRead,
+  markAllRead
 }) => {
   const classes = useStyles();
 
@@ -37,18 +38,18 @@ const ActiveChat = ({
   const isConversation = (obj) => {
     return obj !== {} && obj !== undefined;
   };
-  
 
   const markMessageRead =(readMessage) => {
+    const type = "individual"
     const messagesCopy = [...conversation.messages].map((message) => {
-      if (message.text === readMessage.text) {
+      if (message.id === readMessage.id) {
         return {...message, isRead: true};
       } else {
         return message;
       }
     });
     const readConversation = {...conversation, messages: messagesCopy};
-    markMessagesRead (readConversation, user.id)
+    markMessagesRead (type, readConversation, user.id, readMessage.id)
   }
 
  

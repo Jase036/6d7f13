@@ -36,7 +36,9 @@ const OtherUserBubble = ({ message, time, otherUser, markMessageRead }) => {
   const classes = useStyles();
 
 useEffect (()=> {
+  if (!message.isRead) {
   markMessageRead(message)
+  }
 },[]) // eslint-disable-line
 
   return (

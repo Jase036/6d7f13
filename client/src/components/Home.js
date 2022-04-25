@@ -83,6 +83,17 @@ const Home = ({ user, logout }) => {
     }
   };
 
+
+  const updateMessages = async (type, conversationId, messageId, userId) => {
+    const body = {conversationId, messageId, userId}
+    const { data } = type==="batch" ? 
+      await axios.put('/api/messages', body) 
+      : 
+      await axios.patch('/api/messages', body);
+
+    return data;
+  };
+
   const addNewConvo = useCallback(
     (recipientId, message) => {
       
@@ -142,7 +153,8 @@ const Home = ({ user, logout }) => {
     setActiveConversation(username);
   };
 
-  const markMessagesRead = (conversation, userId) => {
+  const markMessagesRead = useCallback (
+    (type, conversation, userId, messageId) => {
 
     const convoMessages = [...conversation.messages].map((message) => {
       if (message.senderId !== userId) {
@@ -164,9 +176,12 @@ const Home = ({ user, logout }) => {
         }
       })
       return convoArrCopy
-    }
-    )
-  };
+    });
+    
+    updateMessages(type, conversation.id, messageId, userId);
+  }, [setConversations]);
+
+
 
   const addOnlineUser = useCallback((id) => {
     setConversations((prev) =>
@@ -259,6 +274,7 @@ const Home = ({ user, logout }) => {
           clearSearchedUsers={clearSearchedUsers}
           addSearchedUsers={addSearchedUsers}
           setActiveChat={setActiveChat}
+          markMessagesRead={markMessagesRead}
         />
         <ActiveChat
           activeConversation={activeConversation}

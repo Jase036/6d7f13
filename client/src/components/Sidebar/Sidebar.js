@@ -24,10 +24,9 @@ const Sidebar = ({
   conversations = [],
   user,
   setActiveChat,
+  markMessagesRead
 }) => {
   const classes = useStyles();
-
-
   return (
     <Box className={classes.root}>
       <CurrentUser user={user} />
@@ -47,6 +46,8 @@ const Sidebar = ({
               key={conversation.otherUser.username}
               setActiveChat={setActiveChat}
               unreadMessages = {unreadMessages}
+              user={user}
+              markMessagesRead={markMessagesRead}
             />
           );
         })}
