@@ -22,6 +22,7 @@ const Home = ({ user, logout }) => {
 
   const [conversations, setConversations] = useState([]);
   const [activeConversation, setActiveConversation] = useState(null);
+  
 
   const classes = useStyles();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -141,6 +142,32 @@ const Home = ({ user, logout }) => {
     setActiveConversation(username);
   };
 
+  const markMessagesRead = (conversation, userId) => {
+
+    const convoMessages = [...conversation.messages].map((message) => {
+      if (message.senderId !== userId) {
+      return {...message, isRead:true}
+      } else {
+        return message
+      }
+    }); 
+      
+    setConversations((prev) => {
+
+      const convoArrCopy = [...prev].map((convo) => {
+        const convoCopy = { ...convo };
+        if (conversation.otherUser.username === convo.otherUser.username) {
+          convoCopy.messages = convoMessages;
+          return convoCopy
+        } else { 
+          return convo 
+        }
+      })
+      return convoArrCopy
+    }
+    )
+  };
+
   const addOnlineUser = useCallback((id) => {
     setConversations((prev) =>
       prev.map((convo) => {
@@ -238,6 +265,7 @@ const Home = ({ user, logout }) => {
           conversations={conversations}
           user={user}
           postMessage={postMessage}
+          markMessagesRead={markMessagesRead}
         />
       </Grid>
     </>

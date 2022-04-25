@@ -24,6 +24,7 @@ const ActiveChat = ({
   conversations,
   activeConversation,
   postMessage,
+  markMessagesRead
 }) => {
   const classes = useStyles();
 
@@ -36,7 +37,21 @@ const ActiveChat = ({
   const isConversation = (obj) => {
     return obj !== {} && obj !== undefined;
   };
+  
 
+  const markMessageRead =(readMessage) => {
+    const messagesCopy = [...conversation.messages].map((message) => {
+      if (message.text === readMessage.text) {
+        return {...message, isRead: true};
+      } else {
+        return message;
+      }
+    });
+    const readConversation = {...conversation, messages: messagesCopy};
+    markMessagesRead (readConversation, user.id)
+  }
+
+ 
   return (
     <Box className={classes.root} >
       {isConversation(conversation) && conversation.otherUser && (
@@ -52,6 +67,7 @@ const ActiveChat = ({
                   messages={conversation.messages}
                   otherUser={conversation.otherUser}
                   userId={user.id}
+                  markMessageRead={markMessageRead}
                 />
                 <Input
                   otherUser={conversation.otherUser}

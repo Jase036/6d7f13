@@ -17,7 +17,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Chat = ({ conversation, setActiveChat }) => {
+const Chat = ({ conversation, setActiveChat, unreadMessages }) => {
   const classes = useStyles();
   const { otherUser } = conversation;
 
@@ -34,6 +34,7 @@ const Chat = ({ conversation, setActiveChat }) => {
         sidebar={true}
       />
       <ChatContent conversation={conversation} />
+      {unreadMessages > 0 && <p>{unreadMessages}</p>}
     </Box>
   );
 };

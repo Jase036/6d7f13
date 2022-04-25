@@ -27,6 +27,7 @@ const Sidebar = ({
 }) => {
   const classes = useStyles();
 
+
   return (
     <Box className={classes.root}>
       <CurrentUser user={user} />
@@ -37,11 +38,15 @@ const Sidebar = ({
           conversation.otherUser.username.includes(searchTerm)
         )
         .map((conversation) => {
+          const unreadMessages = conversation.messages.filter((message) => {
+            return (!message.isRead && message.senderId !== user.id)
+          }).length 
           return (
             <Chat
               conversation={conversation}
               key={conversation.otherUser.username}
               setActiveChat={setActiveChat}
+              unreadMessages = {unreadMessages}
             />
           );
         })}
