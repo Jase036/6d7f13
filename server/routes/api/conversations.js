@@ -11,6 +11,7 @@ router.get("/", async (req, res, next) => {
       return res.sendStatus(401);
     }
     const userId = req.user.id;
+    
     const conversations = await Conversation.findAll({
       where: {
         [Op.or]: {
@@ -19,9 +20,11 @@ router.get("/", async (req, res, next) => {
         },
       },
       attributes: ["id"],
-      order: [[Message, "createdAt", "DESC"]],
+      order: [
+        [Message, "createdAt", "ASC"]
+      ],
       include: [
-        { model: Message, order: ["createdAt", "DESC"] },
+        { model: Message},
         {
           model: User,
           as: "user1",
@@ -66,11 +69,13 @@ router.get("/", async (req, res, next) => {
       } else {
         convoJSON.otherUser.online = false;
       }
-
+      
       // set properties for notification count and latest message preview
-      convoJSON.latestMessageText = convoJSON.messages[0].text;
+      convoJSON.latestMessageText = convoJSON.messages[convoJSON.messages.length - 1].text;
       conversations[i] = convoJSON;
     }
+    
+    conversations.sort((a, b) => a.messages[a.messages.length - 1].updatedAt > b.messages[b.messages.length - 1].updatedAt ? -1 : 1)
 
     res.json(conversations);
   } catch (error) {

@@ -38,7 +38,7 @@ const ActiveChat = ({
   };
 
   return (
-    <Box className={classes.root}>
+    <Box className={classes.root} >
       {isConversation(conversation) && conversation.otherUser && (
         <>
           <Header
@@ -58,6 +58,7 @@ const ActiveChat = ({
                   conversationId={conversation.id || null}
                   user={user}
                   postMessage={postMessage}
+                  messages={conversation.messages}
                 />
               </>
             )}
