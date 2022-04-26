@@ -57,6 +57,16 @@ const Home = ({ user, logout }) => {
     return data;
   };
 
+  const updateReadMessagesDB = async (type, conversationId, messageId, userId) => {  
+    const body = {conversationId, messageId, userId}
+    const { data } = type==="batch" ? 
+      await axios.put('/api/messages', body) 
+      : 
+      await axios.patch('/api/messages', body);
+
+    return data;
+  };
+
   const sendMessage = (data, body) => {
     socket.emit('new-message', {
       message: data.message,
@@ -64,6 +74,8 @@ const Home = ({ user, logout }) => {
       sender: data.sender,
     });
   };
+
+  
 
   const postMessage = async (body) => {
     
@@ -83,17 +95,7 @@ const Home = ({ user, logout }) => {
     }
   };
 
-
-  const updateMessages = async (type, conversationId, messageId, userId) => {
-    const body = {conversationId, messageId, userId}
-    const { data } = type==="batch" ? 
-      await axios.put('/api/messages', body) 
-      : 
-      await axios.patch('/api/messages', body);
-
-    return data;
-  };
-
+  
   const addNewConvo = useCallback(
     (recipientId, message) => {
       
@@ -154,34 +156,67 @@ const Home = ({ user, logout }) => {
   };
 
   const markMessagesRead = useCallback (
-    (type, conversation, userId, messageId) => {
+    (data) => {
 
-    const convoMessages = [...conversation.messages].map((message) => {
+    const { type, conversation, userId, messageId = undefined } = data
+    
+    
+    const convoMessages = type === "batch" ? [...conversation.messages].map((message) => {
       if (message.senderId !== userId) {
-      return {...message, isRead:true}
+        return {...message, isRead:true}
       } else {
-        return message
+        return {...message}
       }
-    }); 
-      
+    }) : conversation.messages;
+    
     setConversations((prev) => {
-
+      
       const convoArrCopy = [...prev].map((convo) => {
         const convoCopy = { ...convo };
         if (conversation.otherUser.username === convo.otherUser.username) {
-          convoCopy.messages = convoMessages;
+          convoCopy.messages = convoMessages
           return convoCopy
         } else { 
-          return convo 
+          return {...convo} 
         }
       })
       return convoArrCopy
     });
     
-    updateMessages(type, conversation.id, messageId, userId);
+    updateReadMessagesDB(type, conversation.id, messageId, userId);
+    
   }, [setConversations]);
 
+const sentReadUpdate = (data) => {
 
+  const { conversation, userId } = data
+  console.log (userId)
+  const convoMessages = [...conversation.messages].map((message) => {
+    if (message.senderId === userId) {
+      return {...message, isRead:true}
+    } else {
+      return {...message}
+    }
+  })
+  
+  setConversations((prev) => {
+    
+    const convoArrCopy = [...prev].map((convo) => {
+      const convoCopy = { ...convo };
+      if (conversation.id === convo.id) {
+        convoCopy.messages = convoMessages
+        return convoCopy
+      } else { 
+        return {...convo} 
+      }
+    })
+    
+    return convoArrCopy
+  });
+
+
+  
+}
 
   const addOnlineUser = useCallback((id) => {
     setConversations((prev) =>
@@ -218,15 +253,20 @@ const Home = ({ user, logout }) => {
     socket.on('add-online-user', addOnlineUser);
     socket.on('remove-offline-user', removeOfflineUser);
     socket.on('new-message', addMessageToConversation);
+    socket.on('update-message', (data) => {
+      console.log(data);
+      sentReadUpdate(data)});
 
     return () => {
+      console.log("unmount")
       // before the component is destroyed
       // unbind all event handlers used in this component
       socket.off('add-online-user', addOnlineUser);
       socket.off('remove-offline-user', removeOfflineUser);
       socket.off('new-message', addMessageToConversation);
+      socket.on('update-message', sentReadUpdate);
     };
-  }, [addMessageToConversation, addOnlineUser, removeOfflineUser, socket]);
+  }, [addMessageToConversation, addOnlineUser, removeOfflineUser, markMessagesRead, socket]);
 
   useEffect(() => {
     // when fetching, prevent redirect

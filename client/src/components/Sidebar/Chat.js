@@ -1,7 +1,8 @@
-import React from 'react';
-import { Box } from '@material-ui/core';
+import React, { useContext } from 'react';
+import { Box, Typography } from '@material-ui/core';
 import { BadgeAvatar, ChatContent } from '../Sidebar';
 import { makeStyles } from '@material-ui/core/styles';
+import { SocketContext } from '../../context/socket';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -15,16 +16,43 @@ const useStyles = makeStyles((theme) => ({
       cursor: 'grab',
     },
   },
+  unread: {
+    backgroundColor: "#3F92FF",
+    borderRadius: "10px",
+    padding: "0 7px",
+    marginRight: "5px",
+    height: "20px",
+  },
+  unreadFont: {
+    fontFamily: 'Open Sans',
+    fontStyle: "normal",
+    fontWeight: 700,
+    fontSize: "14px",
+    lineHeight: "20px",
+    letterSpacing: "-0.5px",
+    color: "#FFFFFF",
+  }
 }));
 
 const Chat = ({ conversation, setActiveChat, unreadMessages, user, markMessagesRead }) => {
+  const socket = useContext(SocketContext)
   const classes = useStyles();
   const { otherUser } = conversation;
 
   const handleClick = async (conversation) => {
     if (conversation.messages.filter(message => !message.isRead && message.senderId !== user.id).length > 0) {
     const type = "batch"
-    markMessagesRead(type, conversation, user.id)
+    const data = {
+      type,
+      conversation,
+      userId: user.id
+    }
+    socket.emit('update-message', {
+      conversation,
+      userId: user.id,
+    })
+
+    markMessagesRead(data)
     }
     await setActiveChat(conversation.otherUser.username);
     
@@ -39,7 +67,7 @@ const Chat = ({ conversation, setActiveChat, unreadMessages, user, markMessagesR
         sidebar={true}
       />
       <ChatContent conversation={conversation} />
-      {unreadMessages > 0 && <p>{unreadMessages}</p>}
+      {unreadMessages > 0 && <Typography className={[classes.unread, classes.unreadFont]}>{unreadMessages}</Typography>}
     </Box>
   );
 };

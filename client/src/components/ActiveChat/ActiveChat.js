@@ -25,7 +25,6 @@ const ActiveChat = ({
   activeConversation,
   postMessage,
   markMessagesRead,
-  markAllRead
 }) => {
   const classes = useStyles();
 
@@ -41,7 +40,7 @@ const ActiveChat = ({
 
   const markMessageRead =(readMessage) => {
     const type = "individual"
-    const messagesCopy = [...conversation.messages].map((message) => {
+    const messagesCopy = conversation.messages.map((message) => {
       if (message.id === readMessage.id) {
         return {...message, isRead: true};
       } else {
@@ -49,7 +48,14 @@ const ActiveChat = ({
       }
     });
     const readConversation = {...conversation, messages: messagesCopy};
-    markMessagesRead (type, readConversation, user.id, readMessage.id)
+    const data = {
+      type,
+      conversation: readConversation,
+      userId: user.id,
+      messageId: readMessage.id
+    }
+
+    markMessagesRead (data)
   }
 
  
@@ -69,6 +75,7 @@ const ActiveChat = ({
                   otherUser={conversation.otherUser}
                   userId={user.id}
                   markMessageRead={markMessageRead}
+                  conversation = {conversation}
                 />
                 <Input
                   otherUser={conversation.otherUser}

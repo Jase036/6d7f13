@@ -64,7 +64,6 @@ router.patch("/", async (req, res, next) => {
       }
     )
 
-    console.log(readUpdate)
     res.json({ readUpdate });
   } catch (error) {
       next(error);
@@ -89,7 +88,7 @@ router.patch("/", async (req, res, next) => {
         }        
       )
   
-      console.log(readUpdate)
+
       res.json({ readUpdate });
     } catch (error) {
         next(error);

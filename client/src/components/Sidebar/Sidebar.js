@@ -40,6 +40,7 @@ const Sidebar = ({
           const unreadMessages = conversation.messages.filter((message) => {
             return (!message.isRead && message.senderId !== user.id)
           }).length 
+          
           return (
             <Chat
               conversation={conversation}
