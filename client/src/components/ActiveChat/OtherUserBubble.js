@@ -32,22 +32,27 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const OtherUserBubble = ({ message, time, otherUser, markMessageRead, conversation }) => {
-  const socket = useContext(SocketContext)
+const OtherUserBubble = ({
+  message,
+  time,
+  otherUser,
+  markMessageRead,
+  conversation,
+}) => {
+  const socket = useContext(SocketContext);
   const { text } = message;
   const classes = useStyles();
 
-useEffect (()=> {
-  if (!message.isRead) {
-    socket.emit('update-message', {
-      conversation,
-      userId: message.senderId,
-  })
+  useEffect(() => {
+    if (!message.isRead) {
+      socket.emit('update-message', {
+        conversation,
+        userId: message.senderId,
+      });
 
-    markMessageRead(message)
-  }
-  
-},[]) // eslint-disable-line
+      markMessageRead(message);
+    }
+  }, []); // eslint-disable-line
 
   return (
     <Box className={classes.root}>

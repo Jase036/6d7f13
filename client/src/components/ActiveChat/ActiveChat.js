@@ -38,29 +38,28 @@ const ActiveChat = ({
     return obj !== {} && obj !== undefined;
   };
 
-  const markMessageRead =(readMessage) => {
-    const type = "individual"
+  const markMessageRead = (readMessage) => {
+    const type = 'individual';
     const messagesCopy = conversation.messages.map((message) => {
       if (message.id === readMessage.id) {
-        return {...message, isRead: true};
+        return { ...message, isRead: true };
       } else {
         return message;
       }
     });
-    const readConversation = {...conversation, messages: messagesCopy};
+    const readConversation = { ...conversation, messages: messagesCopy };
     const data = {
       type,
       conversation: readConversation,
       userId: user.id,
-      messageId: readMessage.id
-    }
+      messageId: readMessage.id,
+    };
 
-    markMessagesRead (data)
-  }
+    markMessagesRead(data);
+  };
 
- 
   return (
-    <Box className={classes.root} >
+    <Box className={classes.root}>
       {isConversation(conversation) && conversation.otherUser && (
         <>
           <Header
@@ -75,7 +74,7 @@ const ActiveChat = ({
                   otherUser={conversation.otherUser}
                   userId={user.id}
                   markMessageRead={markMessageRead}
-                  conversation = {conversation}
+                  conversation={conversation}
                 />
                 <Input
                   otherUser={conversation.otherUser}

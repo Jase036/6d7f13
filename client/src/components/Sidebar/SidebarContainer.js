@@ -8,7 +8,7 @@ const SidebarContainer = ({
   clearSearchedUsers,
   addSearchedUsers,
   setActiveChat,
-  markMessagesRead
+  markMessagesRead,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
