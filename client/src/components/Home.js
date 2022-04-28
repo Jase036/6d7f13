@@ -126,7 +126,7 @@ const Home = ({ user, logout }) => {
           messages: [message],
         };
         newConvo.latestMessageText = message.text;
-        
+
         setConversations((prev) => [newConvo, ...prev]);
       } else {
 
@@ -258,7 +258,7 @@ const Home = ({ user, logout }) => {
       socket.off('add-online-user', addOnlineUser);
       socket.off('remove-offline-user', removeOfflineUser);
       socket.off('new-message', addMessageToConversation);
-      socket.on('update-message', sentReadUpdate);
+      socket.off('update-message', sentReadUpdate);
     };
   }, [
     addMessageToConversation,
