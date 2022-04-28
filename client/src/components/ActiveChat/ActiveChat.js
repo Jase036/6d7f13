@@ -39,8 +39,8 @@ const ActiveChat = ({
   };
 
   const markMessageRead = (readMessage) => {
-    const type = 'individual';
-    const messagesCopy = conversation.messages.map((message) => {
+
+    const messagesCopy = [...conversation.messages].map((message) => {
       if (message.id === readMessage.id) {
         return { ...message, isRead: true };
       } else {
@@ -49,7 +49,7 @@ const ActiveChat = ({
     });
     const readConversation = { ...conversation, messages: messagesCopy };
     const data = {
-      type,
+      type: 'individual',
       conversation: readConversation,
       userId: user.id,
       messageId: readMessage.id,

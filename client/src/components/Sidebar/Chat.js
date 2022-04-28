@@ -22,8 +22,6 @@ const useStyles = makeStyles((theme) => ({
     padding: '0 7px',
     marginRight: '5px',
     height: '20px',
-  },
-  unreadFont: {
     fontFamily: 'Open Sans',
     fontStyle: 'normal',
     fontWeight: 700,
@@ -51,9 +49,8 @@ const Chat = ({
         (message) => !message.isRead && message.senderId !== user.id
       ).length > 0
     ) {
-      const type = 'batch';
       const data = {
-        type,
+        type: "batch",
         conversation,
         userId: user.id,
       };
@@ -61,7 +58,7 @@ const Chat = ({
       //sends socket event to update all messages in conversation have been read
       socket.emit('update-message', {
         conversation,
-        userId: user.id,
+        userId: otherUser.id,
       });
 
       markMessagesRead(data);
@@ -79,9 +76,7 @@ const Chat = ({
       />
       <ChatContent conversation={conversation} />
       {unreadMessages > 0 && (
-        <Typography className={[classes.unread, classes.unreadFont]}>
-          {unreadMessages}
-        </Typography>
+        <Typography className={classes.unread}>{unreadMessages}</Typography>
       )}
     </Box>
   );

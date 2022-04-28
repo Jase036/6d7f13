@@ -100,13 +100,13 @@ const Home = ({ user, logout }) => {
       setConversations((prev) => {
         const convoArrCopy = [...prev].map((convo) => {
           const convoCopy = { ...convo };
-          if (convo.otherUser.id === recipientId) {
+          if (convoCopy.otherUser.id === recipientId) {
             convoCopy.messages = [...convoCopy.messages, message];
-            convo.latestMessageText = message.text;
-            convo.id = message.conversationId;
+            convoCopy.latestMessageText = message.text;
+            convoCopy.id = message.conversationId;
             return convoCopy;
           } else {
-            return convo;
+            return {...convo};
           }
         });
         return convoArrCopy;
@@ -126,22 +126,24 @@ const Home = ({ user, logout }) => {
           messages: [message],
         };
         newConvo.latestMessageText = message.text;
+        
         setConversations((prev) => [newConvo, ...prev]);
-      }
+      } else {
 
-      setConversations((prev) => {
-        const convoArrCopy = [...prev].map((convo) => {
-          const convoCopy = { ...convo };
-          if (convo.id === message.conversationId) {
-            convoCopy.messages = [...convoCopy.messages, message];
-            convoCopy.latestMessageText = message.text;
-            return convoCopy;
-          } else {
-            return convo;
-          }
+        setConversations((prev) => {
+          const convoArrCopy = [...prev].map((convo) => {
+            const convoCopy = { ...convo };
+            if (convo.id === message.conversationId) {
+              convoCopy.messages = [...convoCopy.messages, message];
+              convoCopy.latestMessageText = message.text;
+              return convoCopy;
+            } else {
+              return convo;
+            }
+          });
+          return convoArrCopy;
         });
-        return convoArrCopy;
-      });
+      }
     },
     [setConversations]
   );
@@ -188,8 +190,7 @@ const Home = ({ user, logout }) => {
   const sentReadUpdate = useCallback(
     (data) => {
       const { conversation, userId } = data;
-
-      const convoMessages = [...conversation.messages].map((message) => {
+      const convoMessages = conversation.messages.map((message) => {
         if (message.senderId === userId) {
           return { ...message, isRead: true };
         } else {
