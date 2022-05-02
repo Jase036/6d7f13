@@ -36,7 +36,7 @@ const OtherUserBubble = ({
   message,
   time,
   otherUser,
-  markMessageRead,
+  markMessagesRead,
   conversation,
 }) => {
   const socket = useContext(SocketContext);
@@ -50,9 +50,17 @@ const OtherUserBubble = ({
         userId: message.senderId,
       });
 
-      markMessageRead(message);
+      const data = {
+        type: 'individual',
+        conversation: conversation,
+        userId: message.senderId,
+        messageId: message.id,
+        recipientId: otherUser.id
+      }
+
+      markMessagesRead(data);
     }
-  }, []); // eslint-disable-line
+  }); 
 
   return (
     <Box className={classes.root}>

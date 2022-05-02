@@ -56,23 +56,34 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-router.patch("/", async (req, res, next) => {
+router.patch("/read", async (req, res, next) => {
+  const { conversationId, messageId, userId, recipientId, type } = req.body;
+console.log(req.user)
+
   try {
     if (!req.user) {
       return res.sendStatus(401);
+    } 
+    else if (userId !== req.user.id && recipientId !== req.user.id) {
+      return res.sendStatus(403);
     }
 
-    const { conversationId, messageId, userId } = req.body;
+    //define where the update operation happens based on the type
+    const whereQuery = type === 'individual' ? {
+      [Op.and]: {
+        conversationId: conversationId,
+        id: messageId,
+      },
+    } : {
+      conversationId: conversationId,
+      senderId: { [Op.ne]: userId },
+    }
+
 
     const readUpdate = await Message.update(
       { isRead: true },
       {
-        where: {
-          [Op.and]: {
-            conversationId: conversationId,
-            id: messageId,
-          },
-        },
+        where: whereQuery,
       }
     );
 
@@ -82,27 +93,4 @@ router.patch("/", async (req, res, next) => {
   }
 });
 
-router.put("/", async (req, res, next) => {
-  try {
-    if (!req.user) {
-      return res.sendStatus(401);
-    }
-
-    const { conversationId, userId } = req.body;
-
-    const readUpdate = await Message.update(
-      { isRead: true },
-      {
-        where: {
-          conversationId: conversationId,
-          senderId: { [Op.ne]: userId },
-        },
-      }
-    );
-
-    res.json({ readUpdate });
-  } catch (error) {
-    next(error);
-  }
-});
 module.exports = router;

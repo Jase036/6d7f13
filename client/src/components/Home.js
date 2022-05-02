@@ -60,14 +60,11 @@ const Home = ({ user, logout }) => {
     type,
     conversationId,
     messageId,
-    userId
+    userId, 
+    recipientId
   ) => {
-    const body = { conversationId, messageId, userId };
-    const { data } =
-      type === 'batch'
-        ? await axios.put('/api/messages', body)
-        : await axios.patch('/api/messages', body);
-
+    const body = { conversationId, messageId, userId, recipientId, type };
+    const { data } = axios.patch('/api/messages/read', body)
     return data;
   };
 
@@ -155,18 +152,20 @@ const Home = ({ user, logout }) => {
   //updates state with read status
   const markMessagesRead = useCallback(
     (data) => {
-      const { type, conversation, userId, messageId = undefined } = data;
+      const { type, conversation, userId, recipientId, messageId = undefined } = data;
+      
+       const convoMessages = [...conversation.messages].map((message) => {
 
-      const convoMessages =
-        type === 'batch'
-          ? [...conversation.messages].map((message) => {
-              if (message.senderId !== userId) {
-                return { ...message, isRead: true };
-              } else {
-                return { ...message };
-              }
-            })
-          : conversation.messages;
+          // if batch update we change all the messages received to read, if individual only the matching message id
+          const readCondition = type === 'batch' ? (message.senderId !== userId) : (message.id === messageId)
+
+            if (readCondition) {
+              return { ...message, isRead: true };
+            } else {
+              return { ...message };
+            }
+          })
+
 
       setConversations((prev) => {
         const convoArrCopy = [...prev].map((convo) => {
@@ -181,9 +180,9 @@ const Home = ({ user, logout }) => {
         return convoArrCopy;
       });
 
-      updateReadMessagesDB(type, conversation.id, messageId, userId);
+      updateReadMessagesDB(type, conversation.id, messageId, user.id, recipientId);
     },
-    [setConversations]
+    [setConversations, user.id]
   );
 
   //updates read status on sent messages based on socket.io events for realtime read indication.

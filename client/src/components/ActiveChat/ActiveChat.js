@@ -38,26 +38,6 @@ const ActiveChat = ({
     return obj !== {} && obj !== undefined;
   };
 
-  const markMessageRead = (readMessage) => {
-
-    const messagesCopy = [...conversation.messages].map((message) => {
-      if (message.id === readMessage.id) {
-        return { ...message, isRead: true };
-      } else {
-        return message;
-      }
-    });
-    const readConversation = { ...conversation, messages: messagesCopy };
-    const data = {
-      type: 'individual',
-      conversation: readConversation,
-      userId: user.id,
-      messageId: readMessage.id,
-    };
-
-    markMessagesRead(data);
-  };
-
   return (
     <Box className={classes.root}>
       {isConversation(conversation) && conversation.otherUser && (
@@ -73,7 +53,7 @@ const ActiveChat = ({
                   messages={conversation.messages}
                   otherUser={conversation.otherUser}
                   userId={user.id}
-                  markMessageRead={markMessageRead}
+                  markMessagesRead={markMessagesRead}
                   conversation={conversation}
                 />
                 <Input

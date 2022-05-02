@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { Box, Typography } from '@material-ui/core';
+import { Badge, Box } from '@material-ui/core';
 import { BadgeAvatar, ChatContent } from '../Sidebar';
 import { makeStyles } from '@material-ui/core/styles';
 import { SocketContext } from '../../context/socket';
@@ -17,18 +17,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   unread: {
-    backgroundColor: '#3F92FF',
-    borderRadius: '10px',
-    padding: '0 7px',
-    marginRight: '5px',
-    height: '20px',
-    fontFamily: 'Open Sans',
-    fontStyle: 'normal',
-    fontWeight: 700,
-    fontSize: '14px',
-    lineHeight: '20px',
-    letterSpacing: '-0.5px',
-    color: '#FFFFFF',
+    left: "-20px", 
   },
 }));
 
@@ -45,14 +34,13 @@ const Chat = ({
 
   const handleClick = async (conversation) => {
     if (
-      conversation.messages.filter(
-        (message) => !message.isRead && message.senderId !== user.id
-      ).length > 0
+      conversation.unreadCount > 0
     ) {
       const data = {
         type: "batch",
         conversation,
         userId: user.id,
+        recipientId: otherUser.id
       };
 
       //sends socket event to update all messages in conversation have been read
@@ -74,9 +62,9 @@ const Chat = ({
         online={otherUser.online}
         sidebar={true}
       />
-      <ChatContent conversation={conversation} />
+      <ChatContent conversation={conversation} unreadMessages={unreadMessages} />
       {unreadMessages > 0 && (
-        <Typography className={classes.unread}>{unreadMessages}</Typography>
+        <Badge badgeContent={unreadMessages} color="primary" overlap="rectangular" className={classes.unread}></Badge>
       )}
     </Box>
   );

@@ -4,8 +4,8 @@ import { SenderBubble, OtherUserBubble } from '.';
 import moment from 'moment';
 
 const Messages = (props) => {
-  const { messages, otherUser, userId, markMessageRead, conversation } = props;
-
+  const { messages, otherUser, userId, markMessagesRead, conversation } = props;
+  
   return (
     <Box>
       {messages.map((message) => {
@@ -24,7 +24,7 @@ const Messages = (props) => {
             message={message}
             time={time}
             otherUser={otherUser}
-            markMessageRead={markMessageRead}
+            markMessagesRead={markMessagesRead}
             conversation={conversation}
           />
         );
