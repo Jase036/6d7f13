@@ -55,12 +55,12 @@ const OtherUserBubble = ({
         conversation: conversation,
         userId: message.senderId,
         messageId: message.id,
-        recipientId: otherUser.id
-      }
+        recipientId: otherUser.id,
+      };
 
       markMessagesRead(data);
     }
-  }); 
+  });
 
   return (
     <Box className={classes.root}>
