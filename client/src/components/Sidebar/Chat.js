@@ -17,7 +17,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   unread: {
-    left: "-20px", 
+    left: '-20px',
   },
 }));
 
@@ -33,14 +33,12 @@ const Chat = ({
   const { otherUser } = conversation;
 
   const handleClick = async (conversation) => {
-    if (
-      conversation.unreadCount > 0
-    ) {
+    if (conversation.unreadCount > 0) {
       const data = {
-        type: "batch",
+        type: 'batch',
         conversation,
         userId: user.id,
-        recipientId: otherUser.id
+        recipientId: otherUser.id,
       };
 
       //sends socket event to update all messages in conversation have been read
@@ -62,9 +60,17 @@ const Chat = ({
         online={otherUser.online}
         sidebar={true}
       />
-      <ChatContent conversation={conversation} unreadMessages={unreadMessages} />
+      <ChatContent
+        conversation={conversation}
+        unreadMessages={unreadMessages}
+      />
       {unreadMessages > 0 && (
-        <Badge badgeContent={unreadMessages} color="primary" overlap="rectangular" className={classes.unread}></Badge>
+        <Badge
+          badgeContent={unreadMessages}
+          color="primary"
+          overlap="rectangular"
+          className={classes.unread}
+        />
       )}
     </Box>
   );

@@ -22,7 +22,7 @@ router.get("/", async (req, res, next) => {
       
       attributes: ["id"],
       order: [[Message, "createdAt", "ASC"]],
-      group: ['conversation.id', 'messages.id', 'user1.id', 'user2.id'],
+    
       include: [
         { model: Message },
         {

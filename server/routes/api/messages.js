@@ -58,27 +58,27 @@ router.post("/", async (req, res, next) => {
 
 router.patch("/read", async (req, res, next) => {
   const { conversationId, messageId, userId, recipientId, type } = req.body;
-console.log(req.user)
 
   try {
     if (!req.user) {
       return res.sendStatus(401);
-    } 
-    else if (userId !== req.user.id && recipientId !== req.user.id) {
+    } else if (userId !== req.user.id && recipientId !== req.user.id) {
       return res.sendStatus(403);
     }
 
     //define where the update operation happens based on the type
-    const whereQuery = type === 'individual' ? {
-      [Op.and]: {
-        conversationId: conversationId,
-        id: messageId,
-      },
-    } : {
-      conversationId: conversationId,
-      senderId: { [Op.ne]: userId },
-    }
-
+    const whereQuery =
+      type === "individual"
+        ? {
+            [Op.and]: {
+              conversationId: conversationId,
+              id: messageId,
+            },
+          }
+        : {
+            conversationId: conversationId,
+            senderId: { [Op.ne]: userId },
+          };
 
     const readUpdate = await Message.update(
       { isRead: true },
@@ -87,7 +87,7 @@ console.log(req.user)
       }
     );
 
-    res.json({ readUpdate });
+    res.sendStatus(204);
   } catch (error) {
     next(error);
   }

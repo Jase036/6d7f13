@@ -60,11 +60,11 @@ const Home = ({ user, logout }) => {
     type,
     conversationId,
     messageId,
-    userId, 
+    userId,
     recipientId
   ) => {
     const body = { conversationId, messageId, userId, recipientId, type };
-    const { data } = axios.patch('/api/messages/read', body)
+    const { data } = await axios.patch('/api/messages/read', body);
     return data;
   };
 
@@ -103,7 +103,7 @@ const Home = ({ user, logout }) => {
             convoCopy.id = message.conversationId;
             return convoCopy;
           } else {
-            return {...convo};
+            return { ...convo };
           }
         });
         return convoArrCopy;
@@ -126,7 +126,6 @@ const Home = ({ user, logout }) => {
 
         setConversations((prev) => [newConvo, ...prev]);
       } else {
-
         setConversations((prev) => {
           const convoArrCopy = [...prev].map((convo) => {
             const convoCopy = { ...convo };
@@ -152,20 +151,27 @@ const Home = ({ user, logout }) => {
   //updates state with read status
   const markMessagesRead = useCallback(
     (data) => {
-      const { type, conversation, userId, recipientId, messageId = undefined } = data;
-      
-       const convoMessages = [...conversation.messages].map((message) => {
+      const {
+        type,
+        conversation,
+        userId,
+        recipientId,
+        messageId = undefined,
+      } = data;
 
-          // if batch update we change all the messages received to read, if individual only the matching message id
-          const readCondition = type === 'batch' ? (message.senderId !== userId) : (message.id === messageId)
+      const convoMessages = [...conversation.messages].map((message) => {
+        // if batch update we change all the messages received to read, if individual only the matching message id
+        const readCondition =
+          type === 'batch'
+            ? message.senderId !== userId
+            : message.id === messageId;
 
-            if (readCondition) {
-              return { ...message, isRead: true };
-            } else {
-              return { ...message };
-            }
-          })
-
+        if (readCondition) {
+          return { ...message, isRead: true };
+        } else {
+          return { ...message };
+        }
+      });
 
       setConversations((prev) => {
         const convoArrCopy = [...prev].map((convo) => {
@@ -180,7 +186,13 @@ const Home = ({ user, logout }) => {
         return convoArrCopy;
       });
 
-      updateReadMessagesDB(type, conversation.id, messageId, user.id, recipientId);
+      updateReadMessagesDB(
+        type,
+        conversation.id,
+        messageId,
+        user.id,
+        recipientId
+      );
     },
     [setConversations, user.id]
   );
