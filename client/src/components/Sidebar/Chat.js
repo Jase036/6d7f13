@@ -1,7 +1,8 @@
-import React from 'react';
-import { Box } from '@material-ui/core';
+import React, { useContext } from 'react';
+import { Badge, Box } from '@material-ui/core';
 import { BadgeAvatar, ChatContent } from '../Sidebar';
 import { makeStyles } from '@material-ui/core/styles';
+import { SocketContext } from '../../context/socket';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -15,13 +16,39 @@ const useStyles = makeStyles((theme) => ({
       cursor: 'grab',
     },
   },
+  unread: {
+    left: '-20px',
+  },
 }));
 
-const Chat = ({ conversation, setActiveChat }) => {
+const Chat = ({
+  conversation,
+  setActiveChat,
+  unreadMessages,
+  user,
+  markMessagesRead,
+}) => {
+  const socket = useContext(SocketContext);
   const classes = useStyles();
   const { otherUser } = conversation;
 
   const handleClick = async (conversation) => {
+    if (conversation.unreadCount > 0) {
+      const data = {
+        type: 'batch',
+        conversation,
+        userId: user.id,
+        recipientId: otherUser.id,
+      };
+
+      //sends socket event to update all messages in conversation have been read
+      socket.emit('update-message', {
+        conversation,
+        userId: otherUser.id,
+      });
+
+      markMessagesRead(data);
+    }
     await setActiveChat(conversation.otherUser.username);
   };
 
@@ -33,7 +60,18 @@ const Chat = ({ conversation, setActiveChat }) => {
         online={otherUser.online}
         sidebar={true}
       />
-      <ChatContent conversation={conversation} />
+      <ChatContent
+        conversation={conversation}
+        unreadMessages={unreadMessages}
+      />
+      {unreadMessages > 0 && (
+        <Badge
+          badgeContent={unreadMessages}
+          color="primary"
+          overlap="rectangular"
+          className={classes.unread}
+        />
+      )}
     </Box>
   );
 };
